@@ -1,0 +1,6 @@
+[build]
+bin = "./bin/server"
+cmd = "templ generate && sqlc generate && go build -o bin/server cmd/server/main.go"
+exclude_dir = ["tmp", "db"]
+include_ext = ["go", "templ"]
+exclude_regex = ["templates/.*.go"]
