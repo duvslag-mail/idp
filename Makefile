@@ -10,12 +10,11 @@ dev:
 	docker compose up -d
 	@until docker exec idp_db pg_isready > /dev/null 2>&1; do sleep 1; done
 
-	@echo "Generating templ and sqlc code"
+	@echo "Generating templ and sqlc code..."
 	$(MAKE) generate
 
-	@echo "Compiling & launching server..."
-	go build -o bin/server cmd/server/main.go
-	./bin/server
+	@echo "Starting air.."
+	air
 
 generate:
 	templ generate
