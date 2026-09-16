@@ -33,14 +33,19 @@ func main() {
 
 	r.Use(middleware.Logger)
 
-	r.Get("/", templ.Handler(pages.Home("World")).ServeHTTP)
-	r.Get("/create", func(w http.ResponseWriter, r *http.Request) {
-		q := r.URL.Query()
-		if !q.Has("email") {
+	r.Get("/", templ.Handler(pages.Home()).ServeHTTP)
+
+	r.Post("/create", func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, "Couldn't parse form", 400)
+			return
+		}
+		if !r.PostForm.Has("email") {
 			http.Error(w, "No email specified", 400)
 			return
 		}
-		email := q["email"][0]
+		email := r.PostForm["email"][0]
 
 		user, err := queries.CreateUser(ctx, email)
 		if err != nil {
@@ -49,7 +54,7 @@ func main() {
 			return
 		}
 
-		templ.Handler(pages.Home("created! "+user.Email)).ServeHTTP(w, r)
+		templ.Handler(pages.User(user.Email)).ServeHTTP(w, r)
 	})
 
 	println("Serving on http://localhost:8080")
