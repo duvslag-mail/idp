@@ -1,9 +1,9 @@
 package pages
 
 templ Home() {
-	<p>IDP</p>
-	<form action="/create" method="post">
-		<input name="email" type="email" placeholder="Email">
-		<input type="submit">
-	</form>
+	<div style="display: flex; flex-direction: column;">
+		<p>IDP</p>
+		<a href="/admin-sign-up">Admin Sign Up</a>
+		<a href="/admin-sign-in">Admin Sign In</a>
+	</div>
 }

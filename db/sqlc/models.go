@@ -4,7 +4,59 @@
 
 package sqlc
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
+type OidcAuthRequest struct {
+	ID            pgtype.UUID
+	ClientID      string
+	RedirectUri   string
+	Scope         string
+	State         string
+	CodeChallenge string
+	UserID        pgtype.UUID
+	CreatedAt     pgtype.Timestamp
+	AuthorizedAt  pgtype.Timestamp
+	ExpiresAt     pgtype.Timestamp
+}
+
+type OidcToken struct {
+	ID               int64
+	UserID           pgtype.UUID
+	ClientID         string
+	UserAgent        string
+	IpAddress        string
+	RefreshTokenHash string
+	ExpiresAt        pgtype.Timestamp
+	RevokedAt        pgtype.Timestamp
+	CreatedAt        pgtype.Timestamp
+}
+
+type Passkey struct {
+	ID           int64
+	UserID       pgtype.UUID
+	CredentialID string
+	SignedCount  int64
+	Transports   []string
+	Nickname     pgtype.Text
+	PublicKey    string
+	CreatedAt    pgtype.Timestamp
+	LastUsedAt   pgtype.Timestamp
+}
+
+type RecoveryCode struct {
+	ID       int64
+	UserID   pgtype.UUID
+	CodeHash string
+	UsedAt   pgtype.Timestamp
+}
+
 type User struct {
-	ID    int64
-	Email string
+	ID           pgtype.UUID
+	PasswordHash pgtype.Text
+	Username     string
+	CreatedAt    pgtype.Timestamp
+	Role         string
+	DisabledAt   pgtype.Timestamp
 }
