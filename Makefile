@@ -3,7 +3,8 @@ export
 
 DB_USER ?= postgres
 DB_PASSWORD ?= postgres
-# DB_URL ?= postgres://${DB_USER}:${DB_PASSWORD}@127.0.0.1:5432
+DB_NAME ?= idpdb
+DB_URL ?= postgres://${DB_USER}:${DB_PASSWORD}@127.0.0.1:5432/idpdb?sslmode=disable
 
 dev:
 	@echo "Starting postgres container..."
