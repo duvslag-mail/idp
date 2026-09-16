@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/a-h/templ"
+	"github.com/duvslag-email/idp/db/sqlc"
 	"github.com/duvslag-email/idp/templates/pages"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -27,9 +29,28 @@ func main() {
 	}
 	defer conn.Close(ctx)
 
+	queries := sqlc.New(conn)
+
 	r.Use(middleware.Logger)
 
 	r.Get("/", templ.Handler(pages.Home("World")).ServeHTTP)
+	r.Get("/create", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		if !q.Has("email") {
+			http.Error(w, "No email specified", 400)
+			return
+		}
+		email := q["email"][0]
+
+		user, err := queries.CreateUser(ctx, email)
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, "User already exists", 400)
+			return
+		}
+
+		templ.Handler(pages.Home("created! "+user.Email)).ServeHTTP(w, r)
+	})
 
 	println("Serving on http://localhost:8080")
 	http.ListenAndServe(":8080", r)

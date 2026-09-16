@@ -11,11 +11,20 @@ dev:
 	docker compose up -d
 	@until docker exec idp_db pg_isready > /dev/null 2>&1; do sleep 1; done
 
+	@echo "Running database migrations..."
+	$(MAKE) migrate-up
+
 	@echo "Generating templ and sqlc code..."
 	$(MAKE) generate
 
 	@echo "Starting air.."
 	air
+ 
+migrate-up:
+	goose -dir db/migrations postgres "$(DB_URL)" up
+
+migrate-down:
+	goose -dir db/migrations postgres "$(DB_URL)" downj
 
 generate:
 	templ generate
