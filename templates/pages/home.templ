@@ -1,5 +1,9 @@
 package pages
 
-templ Home(name string) {
-	<div>Hello, { name }</div>
+templ Home() {
+	<p>IDP</p>
+	<form action="/create" method="post">
+		<input name="email" type="email" placeholder="Email">
+		<input type="submit">
+	</form>
 }
