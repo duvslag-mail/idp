@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/duvslag-email/idp/internal/pages"
+	"github.com/duvslag-email/idp/templates/pages"
 )
 
 func main() {
