@@ -9,81 +9,20 @@ import (
 	"context"
 )
 
-const createUser = `-- name: CreateUser :one
-INSERT INTO users (
-  email
-) VALUES (
-  $1
-)
-RETURNING id, email
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id, password_hash, username, created_at, role, disabled_at FROM users WHERE username = $1 LIMIT 1
 `
 
-func (q *Queries) CreateUser(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, email)
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByUsername, username)
 	var i User
-	err := row.Scan(&i.ID, &i.Email)
+	err := row.Scan(
+		&i.ID,
+		&i.PasswordHash,
+		&i.Username,
+		&i.CreatedAt,
+		&i.Role,
+		&i.DisabledAt,
+	)
 	return i, err
-}
-
-const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM users
-WHERE id = $1
-`
-
-func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, deleteUser, id)
-	return err
-}
-
-const getUser = `-- name: GetUser :one
-SELECT id, email FROM users
-WHERE id = $1 LIMIT 1
-`
-
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
-	var i User
-	err := row.Scan(&i.ID, &i.Email)
-	return i, err
-}
-
-const listUsers = `-- name: ListUsers :many
-SELECT id, email FROM users
-ORDER BY email
-`
-
-func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.Query(ctx, listUsers)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []User
-	for rows.Next() {
-		var i User
-		if err := rows.Scan(&i.ID, &i.Email); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const updateUser = `-- name: UpdateUser :exec
-UPDATE users
-  set email = $2
-WHERE id = $1
-`
-
-type UpdateUserParams struct {
-	ID    int64
-	Email string
-}
-
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.Exec(ctx, updateUser, arg.ID, arg.Email)
-	return err
 }
